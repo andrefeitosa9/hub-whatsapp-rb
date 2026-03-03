@@ -1,0 +1,11 @@
+{
+  "_comentario": "Configuracao de conexao com SQL Server",
+  "servidor": "192.168.1.18",
+  "database": "Rbdistrib_Trade",
+  "tipo_autenticacao": "sql",
+  "usuario": "USUARIO_SQL",
+  "senha": "SENHA_SQL",
+  "porta": 1433,
+  "timeout_conexao": 30
+}
+

@@ -1,0 +1,11 @@
+{
+  "evolution": {
+    "base_url": "http://localhost:8080",
+    "api_key": "TOKEN_DA_INSTANCIA",
+    "instance": "NOME_DA_INSTANCIA",
+    "send_text_endpoint": "/message/sendText/{instance}"
+  },
+  "view_pekc": "Rbdistrib_Trade.dbo.vw_ListaProdutosPecksKimberly",
+  "sql_validacao_vendedor": ""
+}
+

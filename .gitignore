@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local tooling
+.python-version
+.mypy_cache/
+.pytest_cache/
+
+# Logs and runtime artifacts
+*.log
+logs/
+
+# Local secrets / environment
+.env
+.env.*
+config_banco.json
+config_bot.json
+
+# OS files
+.DS_Store
+Thumbs.db
+

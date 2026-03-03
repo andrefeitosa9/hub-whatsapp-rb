@@ -1,0 +1,74 @@
+services:
+  postgres_evo:
+    image: postgres:16-alpine
+    container_name: postgres_evo
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: evolution
+    volumes:
+      - pgdata_evo:/var/lib/postgresql/data
+    networks:
+      - evo_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis_evo:
+    image: redis:7-alpine
+    container_name: redis_evo
+    restart: unless-stopped
+    command: redis-server --requirepass redis123
+    networks:
+      - evo_net
+
+  evolution_api:
+    image: evoapicloud/evolution-api:v2.3.6
+    container_name: evolution_api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_TYPE=http
+      - SERVER_PORT=8080
+      - SERVER_URL=http://localhost:8080
+      - AUTHENTICATION_TYPE=apikey
+      - AUTHENTICATION_API_KEY=evolution_api_key_12345
+      - AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=true
+      - DATABASE_ENABLED=true
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://postgres:password123@postgres_evo:5432/evolution?schema=public
+      - DATABASE_CONNECTION_CLIENT_NAME=evolution_api
+      - DATABASE_SAVE_DATA_INSTANCE=true
+      - DATABASE_SAVE_DATA_NEW_MESSAGE=true
+      - DATABASE_SAVE_DATA_CONTACTS=true
+      - DATABASE_SAVE_DATA_CHATS=true
+      - DATABASE_SAVE_DATA_LABELS=true
+      - DATABASE_SAVE_DATA_HISTORIC=true
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://:redis123@redis_evo:6379
+      - CACHE_REDIS_PREFIX_KEY=evo
+      - DEL_INSTANCE=false
+      - QRCODE_LIMIT=30
+      - QRCODE_COLOR=#198754
+      - TZ=America/Sao_Paulo
+    depends_on:
+      postgres_evo:
+        condition: service_healthy
+    networks:
+      - evo_net
+    volumes:
+      - evo_instances:/evolution/instances
+      - evo_store:/evolution/store
+
+networks:
+  evo_net:
+    driver: bridge
+
+volumes:
+  pgdata_evo:
+  evo_instances:
+  evo_store:
