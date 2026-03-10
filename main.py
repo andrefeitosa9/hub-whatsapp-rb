@@ -25,7 +25,7 @@ states: Dict[str, Dict[str, datetime | str]] = {}
 SESSION_TIMEOUT_MINUTES = 10
 
 WELCOME_MESSAGE = (
-    "👋 Bem-vindo à Central de Suporte ao Vendedor.\n\n"
+    "👋 Bem-vindo à Central de Suporte ao RCA.\n\n"
     "Digite somente o código do cliente RB para consultar o PEKC:\n"
     "✅ Atingimento\n"
     "📌 Itens não positivados\n\n"

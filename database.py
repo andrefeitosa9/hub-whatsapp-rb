@@ -26,16 +26,34 @@ class DatabaseService:
         if not self._is_safe_sql_identifier(self.view_name):
             raise ValueError("Nome da view inválido no config_bot.json")
         self.validation_query = bot_config.get("sql_validacao_vendedor", "").strip()
+        self._available_driver = self._detect_driver()
+
+    def _detect_driver(self) -> str:
+        """Detecta qual driver SQL Server está disponível no sistema."""
+        drivers_to_try = [
+            "ODBC Driver 17 for SQL Server",
+            "ODBC Driver 13 for SQL Server",
+            "SQL Server",
+        ]
+        
+        available_drivers = pyodbc.drivers()
+        for driver in drivers_to_try:
+            if driver in available_drivers:
+                return driver
+        
+        raise RuntimeError(
+            f"Nenhum driver SQL Server disponível. "
+            f"Drivers encontrados: {available_drivers}"
+        )
 
     def _connect(self) -> pyodbc.Connection:
         conn_str = (
-            "DRIVER={ODBC Driver 17 for SQL Server};"
+            f"DRIVER={{{self._available_driver}}};"
             f"SERVER={self.db_config['servidor']},{self.db_config.get('porta', 1433)};"
             f"DATABASE={self.db_config['database']};"
             f"UID={self.db_config['usuario']};"
             f"PWD={self.db_config['senha']};"
             f"Connection Timeout={self.db_config.get('timeout_conexao', 30)};"
-            "TrustServerCertificate=yes;"
         )
         return pyodbc.connect(conn_str)
 
@@ -96,7 +114,10 @@ class DatabaseService:
                 NOME_PRODUTO
             FROM produtos
             WHERE QT_VENDIDA <= 0
-            ORDER BY NOME_PRODUTO, COD_PRODUTO;
+            ORDER BY
+                CASE WHEN TRY_CONVERT(BIGINT, COD_PRODUTO) IS NULL THEN 1 ELSE 0 END,
+                TRY_CONVERT(BIGINT, COD_PRODUTO),
+                COD_PRODUTO;
         """
 
         with self._connect() as conn:
